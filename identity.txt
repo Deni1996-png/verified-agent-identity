@@ -1,16 +1,16 @@
-name: did:iden3:billions:main:2VmYDW5WFCsSspwhBEigw8Z5nM2uriezLiL6hU7vQ1
+name: Verify Human Identity
 
 on:
   workflow_dispatch:
     inputs:
       agent_name:auliacaca001
-        description: 'finder'
+        description: auliacaca001
         required: true
-        default: 'finder'
+        default: auliacaca001
       agent_description:
-        description: 'finder'
+        description: auliacaca001
         required: true
-        default: 'finder AI Agent'
+        default: auliacaca001
 
 jobs:
   verify:
