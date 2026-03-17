@@ -3,7 +3,7 @@ name: did:iden3:billions:main:2VmYDW5WFCsSspwhBEigw8Z5nM2uriezLiL6hU7vQ1
 on:
   workflow_dispatch:
     inputs:
-      agent_name:
+      agent_name:auliacaca001
         description: 'finder'
         required: true
         default: 'finder'
