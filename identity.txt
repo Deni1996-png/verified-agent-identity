@@ -1,41 +1,60 @@
 name: Verify Human Identity
 
 on:
-  workflow_dispatch:
-    inputs:
-      agent_name:auliacaca001
-        description: auliacaca001
-        required: true
-        default: auliacaca001
-      agent_description:
-        description: auliacaca001
-        required: true
-        default: auliacaca001
+  workflow_dispatch:
 
 jobs:
-  verify:
-    runs-on: ubuntu-latest
+  verify:
+    runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      DEBUG: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Step 1 - Install ClawHub skill
-        run: npx clawhub@latest install verified-agent-identity
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
 
-      - name: Install script dependencies
-        run: |
-          cd scripts
-          npm install
+      - name: Debug Environment
+        run: |
+          echo "Node version:"
+          node -v
+          echo "NPM version:"
+          npm -v
 
-      - name: Step 2 - Create new Ethereum Identity
-        run: node scripts/createNewEthereumIdentity.js
+      - name: Debug ClawHub availability
+        run: |
+          echo "Checking clawhub..."
+          npx clawhub@latest --version || echo "ClawHub not available"
 
-      - name: Step 3 - Link Human to Agent
-        run: |
-          node scripts/manualLinkHumanToAgent.js --challenge '{"name": "finder", "description": "finder AI Agent"}'
+      - name: Install ClawHub (latest)
+        id: install_latest
+        run: |
+          echo "Trying latest version..."
+          npx clawhub@latest test install verified-agent-identity \
+          && echo "status=success" >> $GITHUB_OUTPUT \
+          || echo "status=failed" >> $GITHUB_OUTPUT
+
+      - name: Fallback install (stable version)
+        if: steps.install_latest.outputs.status == 'failed'
+        run: |
+          echo "Fallback ke versi stabil..."
+          npx clawhub@0.1.0 test install verified-agent-identity
+
+      - name: Verify installation
+        run: |
+          echo "Verifying installation..."
+          if npx clawhub --help; then
+            echo "SUCCESS: ClawHub ready"
+          else
+            echo "FAILED: ClawHub not working"
+            exit 1
+          fi
+
+      - name: Final Status
+        run: echo "Workflow selesai"
